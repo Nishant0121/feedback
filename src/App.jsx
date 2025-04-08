@@ -38,7 +38,7 @@ export default function App() {
             className="flex items-center gap-2 px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-zinc-800 transition"
           >
             <Clipboard className="w-5 h-5" />
-            View Assignments
+            View Feedbacks
           </button>
         </div>
 
