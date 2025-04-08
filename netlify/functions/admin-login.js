@@ -1,4 +1,5 @@
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 exports.handler = async function (event, context) {
   if (event.httpMethod !== "POST") {
@@ -8,15 +9,26 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const { username, password } = JSON.parse(event.body);
+  const { username, email, password } = JSON.parse(event.body);
+  const adminUsername = username || email;
 
   if (
-    username === process.env.ADMIN_USERNAME &&
+    adminUsername === process.env.ADMIN_USERNAME &&
     password === process.env.ADMIN_PASSWORD
   ) {
+    // Generate a JWT token
+    const token = jwt.sign(
+      { username: adminUsername, role: "admin" },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "24h" }
+    );
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Login successful" }),
+      body: JSON.stringify({
+        message: "Login successful",
+        token,
+      }),
     };
   } else {
     return {

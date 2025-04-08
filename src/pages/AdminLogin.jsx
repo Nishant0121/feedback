@@ -16,9 +16,12 @@ export default function AdminLogin() {
       if (res?.token) {
         localStorage.setItem("admin_token", res.token);
         navigate("/admin");
+      } else {
+        setError("Login failed. Please try again.");
       }
     } catch (err) {
       setError("Invalid credentials");
+      console.error("Login error:", err);
     }
   };
 

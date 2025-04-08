@@ -9,9 +9,10 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const { fullName, email, message, timestamp } = JSON.parse(event.body);
+  const { name, email, message } = JSON.parse(event.body);
+  console.log(name, email, message);
 
-  if (!fullName || !email || !message) {
+  if (!name || !email || !message) {
     return {
       statusCode: 400,
       body: JSON.stringify({ message: "Missing required fields" }),
@@ -19,12 +20,13 @@ exports.handler = async function (event, context) {
   }
 
   const client = new MongoClient(process.env.MONGODB_URI);
+  const timestamp = new Date().toISOString();
 
   try {
     await client.connect();
     const db = client.db(process.env.MONGODB_DB);
     const collection = db.collection("feedbacks");
-    await collection.insertOne({ fullName, email, message, timestamp });
+    await collection.insertOne({ name, email, message, timestamp });
 
     return {
       statusCode: 200,
@@ -33,7 +35,10 @@ exports.handler = async function (event, context) {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Error saving feedback", error }),
+      body: JSON.stringify({
+        message: "Error saving feedback",
+        error: error.message,
+      }),
     };
   } finally {
     await client.close();
